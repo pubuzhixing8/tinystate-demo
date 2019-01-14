@@ -2,16 +2,18 @@ import { Container } from './container';
 import { TinyStatePlugin, TINY_STATE_PLUGINS } from './plugin';
 import { Inject, SkipSelf, Optional, OnDestroy } from '@angular/core';
 import { Subscription, combineLatest } from 'rxjs';
-// import { combineLatest } from 'rxjs/internal';
 import { map, switchMap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 
-export type ContainerInstanceMap = Map<string, Container<any>>;
+export type ContainerInstanceMap = Map<string, Container<any>>; // Map key：string，value：状态数据
 
 /**
  * @internal
  */
 export class RootContainer implements OnDestroy {
+  /**
+   * 数据流 数据是一个Map，k,v键值对，关键字->状态数据
+   */
   private readonly _containers = new BehaviorSubject<ContainerInstanceMap>(
     new Map<string, Container<any>>()
   );
@@ -30,7 +32,7 @@ export class RootContainer implements OnDestroy {
       throw new Error('TinyState: Multiple instances of RootContainer found!');
     }
     this._plugins = Array.isArray(plugins) ? plugins : [];
-    this._assignCombinedState();
+    this._assignCombinedState(); // 最终调用handleNewState
   }
 
   private _assignCombinedState() {
@@ -54,6 +56,12 @@ export class RootContainer implements OnDestroy {
       });
   }
 
+  /**
+   * 合并数据流
+   * 合并状态数据，把状态数据转换为这样的数据：{ containerName: string, state: any }，并且
+   * 通过combineLatest合并成一个数据数据流，这样状态数据只有涉及更新，那么这边就会得到通知
+   * @param containers 状态数据的Map
+   */
   private _getCombinedState(containers: ContainerInstanceMap) {
     return combineLatest(
       ...Array.from(containers.entries()).map(([containerName, container]) => {

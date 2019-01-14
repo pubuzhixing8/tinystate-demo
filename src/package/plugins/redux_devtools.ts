@@ -6,10 +6,16 @@ export interface ReduxDevtoolsPluginConfig {
   enabled?: boolean; // default: true
 }
 
+/**
+ * 提供给 provide
+ */
 export const REDUX_DEVTOOLS_PLUGIN_CONFIG = new InjectionToken<ReduxDevtoolsPluginConfig>(
   'REDUX_DEVTOOLS_PLUGIN_CONFIG'
 );
 
+/**
+ * 提供给WINDOW
+ */
 export const REDUX_DEVTOOLS_PLUGIN_WINDOW = new InjectionToken<Window | null>(
   'REDUX_DEVTOOLS_PLUGIN_CONFIG'
 );
@@ -51,6 +57,9 @@ export interface ReduxDevtoolsInstance {
   send(action: string, state: object): void;
 }
 
+/**
+ * DevtoolsPlugin
+ */
 export class ReduxDevtoolsPlugin implements TinyStatePlugin {
   private _devTools: ReduxDevtoolsInstance | null = null;
 
